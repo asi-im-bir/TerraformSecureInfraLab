@@ -8,7 +8,8 @@ Private VM in the private subnet (no public IP, accessible only via Bastion).
 System-assigned Managed Identities enabled for both VMs.
 
 Inputs
-Name	              Type	   Description	                                   Example
+|Name	|              Type	|   Description	|                                   Example|
+| --- | --- |
 resource_group	    string	 The name of the resource group where VMs live	 rg-terraform-securelab
 location	          string	 Azure region for resources	                     westeurope
 public_subnet_id	  string	 ID of the public subnet for the bastion VM	     -
