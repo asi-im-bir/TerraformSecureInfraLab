@@ -1,6 +1,6 @@
 # Terraform Secure Infra Lab
 ## Project Overview
-
+![img.png](img.png)
 This project implements a secure, cost-optimized Azure infrastructure using Terraform Infrastructure as Code (IaC). The architecture follows Azure
 Well-Architected Framework principles with emphasis on security (defense-in-depth) and cost optimization for development/testing environments.
 
@@ -29,7 +29,6 @@ Azure Subscription
     │   └── Database Password Secret
     └── Managed Identities (System-assigned for VMs)
 ```
-
 ## Module Structure
 
 ### Root Module Configuration
@@ -53,6 +52,8 @@ resource "random_string" "suffix" {
 # Module dependency chain
 # network -> compute -> keyvault -> security
 ```
+
+
 -------------------------------------------------------------------------------------------------------------------------
 
 **Compute Overview**
