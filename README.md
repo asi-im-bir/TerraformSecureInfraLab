@@ -1,104 +1,57 @@
 # Terraform Secure Infra Lab
+## Project Overview
 
-A modular Infrastructure-as-Code project that provisions a secure cloud environment with Terraform.
-The setup includes a Virtual Network, public and private subnets, bastion and private VMs, Network Security Groups (NSGs), and secret management using Key Vault.
-Security principles such as least privilege, managed identity, and secure-by-design are applied throughout.
+This project implements a secure, cost-optimized Azure infrastructure using Terraform Infrastructure as Code (IaC). The architecture follows Azure
+Well-Architected Framework principles with emphasis on security (defense-in-depth) and cost optimization for development/testing environments.
 
-A modular Infrastructure-as-Code (IaC) project that provisions a secure, scalable cloud environment in Microsoft Azure using Terraform. This lab demonstrates how to build a production-grade architecture that enforces strong security boundaries, identity-based access, and centralized secret management.
+### Architecture Components
 
----
+- **Virtual Network**: Segmented into public DMZ and private application subnets
+- **Compute**: Bastion host (jump server) in public subnet, application VM in private subnet
+- **Security**: Network Security Groups with restrictive rules, managed identities, Key Vault for secrets
+- **Monitoring**: Azure Monitor agents and Log Analytics integration
+- **Cost Controls**: Auto-shutdown schedules, Basic/Standard SKU selection, free tier optimization
 
-## 📌 Project Overview
-This project demonstrates how to:
-- Create a virtual network with segregated **public and private subnets**.
-- Apply **NSG rules** (allow SSH/RDP only from your IP, deny all else).
-- Deploy a **bastion VM** in the public subnet with a public IP.
-- Deploy a **private VM** in the private subnet (no public IP).
-- Generate **SSH keys automatically**.
-- Store secrets securely in **Key Vault**.
-- Use **system-assigned Managed Identity** for the VM to access secrets.
-- Apply **least privilege principles** for IAM roles and permissions.
+## Technical Architecture
 
----
-
-## 🗂️ Project Phases
-1. **Setup & Preparation**
-   Install tools, authenticate to the cloud, create repo, draft architecture diagram.
-
-2. **Network Setup**
-   Provision VNet/VPC, subnets, and NSG/Security Groups.
-
-3. **Compute (VMs)**
-   Deploy a bastion VM (public subnet) and a private VM (private subnet).
-   Validate connectivity (Your IP → Bastion → Private VM).
-
-4. **Security & Identity**
-   Create Key Vault, store secrets, enable managed identity, assign Reader role.
-
-5. **Integration & Final Delivery**
-   Wire modules together, validate full flow, document security measures.
-
----
-
-## Getting Started
-
-### Prerequisites
-- [Terraform](https://developer.hashicorp.com/terraform/downloads)
-- Cloud CLI (Azure CLI)
-- Git
-
-### Clone the Repo
-```bash
-git clone https://github.com/aporadonelly/terraform-secure-infra-lab.git
-cd terraform-secure-infra-lab
+```
+Azure Subscription
+└── Resource Group (rg-terraform-securelab)
+    ├── Virtual Network (10.0.0.0/16)
+    │   ├── Public Subnet (10.0.1.0/24)
+    │   │   ├── Bastion VM (with Public IP)
+    │   │   └── NSG (Allow SSH from admin IP only)
+    │   └── Private Subnet (10.0.2.0/24)
+    │       ├── Application VM (no public IP)
+    │       └── NSG (Allow SSH from public subnet only)
+    ├── Key Vault
+    │   ├── SSH Private Key
+    │   └── Database Password Secret
+    └── Managed Identities (System-assigned for VMs)
 ```
 
-### Work in Your Own Branch
-```bash
-git checkout -b feature/<your-name>
-git add .
-git commit -m "Added network module resources"
-git push origin feature/<your-name>
+## Module Structure
 
-Then, open a Pull Request (PR) into main when your part is ready. Our teammate will review and will merge.
-```
+### Root Module Configuration
 
-## 👥 Team Roles
+**Files:**
+- `main.tf` - Module orchestration and resource dependencies
+- `variables.tf` - Input variable definitions
+- `outputs.tf` - Output values for module interconnection
+- `providers.tf` - Azure provider configuration
+- `terraform.tfvars` - Variable values (gitignored)
 
-Networking Lead – VNet, subnets, NSGs.
+**Key Implementations:**
+```hcl
+# Random suffix for globally unique names
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
 
-Compute Lead – Bastion and private VMs.
-
-Security Lead – Key Vault, secrets, managed identity.
-
-Integration & Docs Lead – Root wiring, outputs, documentation.
-
-
-## 🏗️ Repo Structure
-
-```mermaid
-flowchart TD
-    A[Root Repo] --> B[main.tf]
-    A --> C[variables.tf]
-    A --> D[outputs.tf]
-    A --> E[modules/]
-
-    E --> F[network/]
-    F --> F1[main.tf]
-    F --> F2[variables.tf]
-    F --> F3[outputs.tf]
-
-    E --> G[compute/]
-    G --> G1[main.tf]
-    G --> G2[variables.tf]
-    G --> G3[outputs.tf]
-
-    E --> H[keyvault/]
-    H --> H1[main.tf]
-    H --> H2[variables.tf]
-    H --> H3[outputs.tf]
-
-    A --> I[README.md]
+# Module dependency chain
+# network -> compute -> keyvault -> security
 ```
 -------------------------------------------------------------------------------------------------------------------------
 
