@@ -55,7 +55,32 @@ resource "random_string" "suffix" {
 
 
 -------------------------------------------------------------------------------------------------------------------------
+### Root Module Configuration
 
+**Files:**
+
+- `main.tf` - Module orchestration and resource dependencies
+- `variables.tf` - Input variable definitions
+- `outputs.tf` - Output values for module interconnection
+- `providers.tf` - Azure provider configuration
+- `terraform.tfvars` - Variable values (gitignored)
+
+**Key Implementations:**
+
+```hcl
+# Random suffix for globally unique names
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+# Module dependency chain
+# network -> compute -> keyvault -> security
+```
+
+
+-------------------------------------------------------------------------------------------------------------------------
 **Compute Overview**
 
 The compute module provisions compute resources for the Secure Cloud Infra project.
@@ -82,14 +107,34 @@ bastion_vm_ip	| Public IP of the Bastion VM | 20.16.122.210
 bastion_vm_principal_id | Principal ID of Bastion VM’s managed identity	| 11111111-2222-3333-4444-555555555555
 private_vm_principal_id | Principal ID of Private VM’s managed identity | 66666666-7777-8888-9999-000000000000
 
-Usage Example (from root)
-module "compute" {
-source              = "./modules/compute"
-resource_group      = azurerm_resource_group.rg.name
-location            = var.resource_group_location
-public_subnet_id    = module.network.public_subnet_id
-private_subnet_id   = module.network.private_subnet_id
-}
+**Purpose:** Deploys hardened Linux VMs with security configurations
+
+**Resources Created:**
+
+- TLS private key (4096-bit RSA)
+- Public IP (Standard SKU due to Basic limitations)
+- Network interfaces with NSG associations
+- Bastion VM (Ubuntu 22.04 LTS)
+- Private VM (Ubuntu 22.04 LTS)
+- Azure Monitor extensions
+- Auto-shutdown schedules (7 PM UTC)
+
+**Security Hardening Implementation:**
+
+Used cloud-config for reliable package installation:
+
+```yaml
+#cloud-config
+packages:
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+runcmd:
+  - Configure firewall rules
+  - Enable fail2ban
+  - Harden SSH configuration
+  - Install Azure CLI from Microsoft repository
+```
 
 **Additional Notes**
 
@@ -97,4 +142,99 @@ Bastion VM is the secure entry point — no direct access is allowed to the priv
 Both VMs use Managed Identities, assigned access to Key Vault or later to other Azure resources.
 Private VM has no public IP to minimize attack surface.
 
+------------------------------------------------------------------------------------------------------------------------
+### Key Vault Module
+**Purpose:** Centralized secrets management
 
+**Resources Created:**
+
+- Azure Key Vault (Standard SKU)
+- Access policies for user and VMs
+- Diagnostic settings for audit logging
+
+**Configuration:**
+
+```hcl
+purge_protection_enabled = false  # For dev/test environments
+soft_delete_retention_days = 7
+enable_rbac_authorization = false  # Using access policies
+
+secret_permissions = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
+```
+-------------------------------------------------------------------------------------------------------------------------
+
+### Security Module
+
+**Purpose:** Implements RBAC and secret storage
+
+**Resources Created:**
+
+- Key Vault secrets (database password)
+- Access policies for VM managed identities
+
+**RBAC Implementation:**
+
+- Private VM: Get permission only for secrets
+- Principle of least privilege enforced
+
+-------------------------------------------------------------------------------------------------------------------------
+### Network Module
+
+**Purpose:** Establishes network foundation with security boundaries
+
+**Resources Created:**
+
+- Virtual Network (10.0.0.0/16)
+- Public Subnet (10.0.1.0/24) with service endpoints
+- Private Subnet (10.0.2.0/24) with service endpoints
+- Network Security Groups with rules
+- NSG-to-subnet associations
+
+**Security Rules Implemented:**
+
+**Public Subnet NSG:**
+
+```
+Inbound:
+  - Allow SSH (22) from admin_source_ip only (Priority: 100)
+  - Deny all other inbound (Priority: 4096)
+Outbound:
+  - Allow HTTPS (443)
+  - Allow HTTP (80)
+  - Allow DNS (53)
+  - Allow SSH to private subnet
+```
+
+**Private Subnet NSG:**
+
+```
+Inbound:
+  - Allow SSH from VirtualNetwork (Priority: 200)
+  - Deny all other inbound (Priority: 4096)
+Outbound:
+  - Allow HTTPS/HTTP/DNS for updates
+```
+
+-------------------------------------------------------------------------------------------------------------------------
+## Security Measures Implemented
+
+1. **Network Segmentation**: Public/private subnet isolation
+2. **Bastion Host Pattern**: Single hardened entry point
+3. **NSG Rules**: Explicit deny-all with specific allows
+4. **No Public IPs**: Private resources have no direct internet exposure
+5. **Managed Identities**: No hardcoded credentials
+6. **SSH Key Authentication**: Password authentication disabled
+7. **Automated Security Updates**: Unattended-upgrades configured
+8. **Fail2ban**: Brute force protection
+9. **UFW Firewall**: Host-level protection
+10. **Audit Logging**: Key Vault access logging
+
+## Cost Optimizations
+
+- **VM SKU**: Standard_B1s (eligible for free tier - 750 hours/month)
+- **Storage**: Standard_LRS (lower cost than Premium)
+- **Public IP**: Standard SKU (Basic had limitations)
+- **Auto-shutdown**: 7 PM UTC daily
+- **Monitoring**: Free tier limits respected
+
+**Estimated Monthly Cost**: ~$15-20 (with auto-shutdown enabled)
