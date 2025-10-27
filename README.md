@@ -1,3 +1,218 @@
+# 🌩️ Terraform Secure Infrastructure Lab — Azure Key Vault Security
+
+## 📘 Project Overview
+
+This project demonstrates a **secure, cost-optimized Azure infrastructure** built with **Terraform Infrastructure as Code (IaC)**.  
+The focus was on implementing **defense-in-depth**, **least privilege**, and **separation of duties** principles using **Azure Key Vault**, **Managed Identities**, and **modular Terraform design**.
+
+The solution aligns with the **Azure Well-Architected Framework**, particularly the **Security**, **Reliability**, and **Cost Optimization** pillars.
+
+---
+
+## 🗺️ Architecture Overview (Visual)
+
+markdown
+Copy code
+                      🌐 Azure Cloud
+┌──────────────────────────────────────────────────────────────┐
+│ Resource Group: rg-terraform-securelab │
+│ │
+│ ┌────────────────────────────────────────────────────────┐ │
+│ │ Virtual Network (10.0.0.0/16) │ │
+│ │ │ │
+│ │ ┌──────────── Public Subnet (10.0.1.0/24) ──────────┐ │ │
+│ │ │ │ │ │
+│ │ │ 🖥️ Bastion Host (Jump Server) │ │ │
+│ │ │ - Public IP (restricted by admin CIDR) │ │ │
+│ │ │ - NSG: Allow SSH from YOUR_PUBLIC_IP only │ │ │
+│ │ └──────────────────────────────────────────────────┘ │ │
+│ │ │ │
+│ │ ┌──────────── Private Subnet (10.0.2.0/24) ─────────┐ │ │
+│ │ │ │ │ │
+│ │ │ 🖥️ Application VM (Private) │ │ │
+│ │ │ - No Public IP │ │ │
+│ │ │ - Accessible only via Bastion Host (SSH) │ │ │
+│ │ │ - Managed Identity enabled │ │ │
+│ │ └──────────────────────────────────────────────────┘ │ │
+│ │ │ │
+│ └────────────────────────────────────────────────────────┘ │
+│ │
+│ 🔐 Azure Key Vault (kv-secure-xxxxxx) │
+│ - Stores secrets (e.g., DB passwords, SSH keys) │
+│ - Access Policy: “Get” only for Private VM identity │
+│ - Soft Delete (7-day retention) enabled │
+│ │
+│ 📊 Azure Monitor & Log Analytics │
+│ - Collects logs and metrics │
+│ - Enables security monitoring & auditing │
+│ │
+└──────────────────────────────────────────────────────────────┘
+
+markdown
+Copy code
+
+### **Key Security Patterns**
+- **Defense-in-Depth:** Layered network and identity security boundaries  
+- **Bastion Host Pattern:** Controlled SSH access through a single hardened entry point  
+- **Secret Zero:** No hardcoded credentials — Key Vault + Managed Identity only  
+- **Least Privilege:** Each resource has minimal access required  
+
+---
+
+## ⚙️ Tech Stack Utilized
+
+| Category | Technologies |
+|-----------|---------------|
+| **Cloud Provider** | Microsoft Azure |
+| **Infrastructure as Code (IaC)** | Terraform |
+| **Security & Identity** | Azure Key Vault, Managed Identities, RBAC, NSGs |
+| **Compute & Network** | Azure Virtual Machines, Virtual Network (VNet), Subnets, Bastion Host |
+| **Monitoring & Logging** | Azure Monitor, Log Analytics |
+| **Development Tools** | Azure CLI, PowerShell, GitHub, VS Code |
+
+---
+
+## 🧠 Problem Statement → Solution
+
+### **Problem**
+Organizations often lack a **secure and repeatable way** to deploy cloud environments for development or testing.  
+Sensitive data such as passwords and SSH keys are often mismanaged, and network boundaries are inconsistently enforced.
+
+### **Input**
+- Terraform configurations defining:
+  - Resource group, VNet, subnets, NSGs  
+  - Compute instances (bastion + private VM)  
+  - Key Vault for secret storage  
+  - Access policies for Managed Identities
+
+### **Output**
+- Fully provisioned **secure Azure environment** with:
+  - Enforced **least privilege** access  
+  - Centralized **secret management**  
+  - Isolated **public/private subnet design**  
+  - Auto-shutdown for cost control  
+
+---
+
+## 🏗️ What I Built
+
+- **Modular Terraform design** separating:
+  - 🔹 Network module (VNet, subnets, NSGs)
+  - 🔹 Compute module (bastion + private VM)
+  - 🔹 Key Vault module (secret management)
+  - 🔹 Security configuration module (access policies)
+- **Azure Key Vault integration** to store and protect SSH keys & app secrets.
+- **Managed Identities** to eliminate plaintext credentials (Secret Zero principle).
+- **Network Security** implementing DMZ pattern with public/private segmentation.
+- **Monitoring & logging** via Azure Monitor and Log Analytics.
+- **Auto-shutdown and optimized compute SKUs** to reduce cost.
+
+---
+
+## 🔐 Cloud Security Domains Addressed
+
+| Domain | Implementation |
+|--------|----------------|
+| **Identity & Access Management (IAM)** | Managed Identities, RBAC, Key Vault policies |
+| **Network Security** | NSGs, subnet isolation, Bastion host access control |
+| **Data Protection** | Key Vault encryption, soft delete, and secret versioning |
+| **Operational Security** | Logging, monitoring, and network segmentation |
+| **Automation Security** | Terraform ensures secure, consistent infrastructure deployment |
+
+---
+
+## 📚 Lessons Learned
+
+- **Separation of Concerns:** Modular Terraform increases scalability and security.  
+- **Principle of Least Privilege:** Minimal “Get” permissions mitigate lateral movement.  
+- **Defense-in-Depth:** Combining IAM, Key Vault, and network restrictions ensures layered protection.  
+- **Security Testing:** Negative access tests validated IAM and NSG boundaries.  
+- **Secret Zero Principle:** Managed Identities eliminate the need for stored credentials.  
+- **Cost Awareness:** Balancing security and cost optimization is critical in IaC design.
+
+---
+
+## 💼 Value to Employers
+
+With this project experience, I can:
+- Architect and deploy **secure Azure environments** using IaC best practices.  
+- Implement **DevSecOps pipelines** that embed security controls early in the SDLC.  
+- Apply **Azure security tools** like Key Vault, NSGs, and RBAC to enforce compliance.  
+- Conduct **security validation, penetration testing, and remediation**.  
+- Implement **continuous compliance** aligned with frameworks such as **ISO 27001**, **NIST CSF**, and **CIS Controls**.  
+
+---
+
+## 🧩 Future Contributions as a DevSecOps & Security GRC Engineer
+
+Building on this project, I can help organizations advance their **DevSecOps maturity** and **governance posture** by:
+
+- **Automating Security Compliance:**  
+  Integrating Terraform with Azure Policy, Sentinel, and Defender for Cloud to continuously enforce compliance across resources.
+
+- **Embedding GRC in CI/CD Pipelines:**  
+  Incorporating compliance-as-code and security testing tools (e.g., Checkov, tfsec, Trivy) to ensure that every code change meets governance and security baselines.
+
+- **Risk Management & Policy Enforcement:**  
+  Mapping Terraform deployments to risk frameworks (ISO 27001, NIST, CIS) to provide traceability between controls and configurations.
+
+- **Vulnerability & Secrets Management:**  
+  Integrating Key Vault with DevOps pipelines to securely inject secrets during runtime and avoid credential exposure in workflows.
+
+- **Incident Response Readiness:**  
+  Using Azure Monitor and Log Analytics data to detect anomalies, audit changes, and support compliance reporting.
+
+- **GRC Dashboards & Reporting:**  
+  Producing compliance dashboards using Azure Monitor, Power BI, or Sentinel to provide real-time visibility into cloud posture.
+
+This knowledge enables me to bridge **technical security automation** with **strategic governance**, helping companies achieve both **secure innovation** and **regulatory compliance**.
+
+---
+
+## 🔮 Potential Future Enhancements
+
+- Integrate with **Azure DevOps** or **GitHub Actions** for CI/CD Terraform automation.  
+- Implement **Azure Policy-as-Code** for compliance enforcement.  
+- Extend Key Vault to use **RBAC-based authorization** instead of access policies.  
+- Add **Private Endpoints** for Key Vault and Storage for full network isolation.  
+- Incorporate **Azure Sentinel** for SIEM-based monitoring.  
+- Expand to **multi-region deployments** with redundancy and disaster recovery.  
+
+---
+
+## 📄 Documentation
+
+- [🔑 Azure Key Vault Module Overview (PDF)](docs/ReadMe_KeyVault_Modules.pdf)  
+- [🧪 Secure Deployment, Testing & Troubleshooting (PDF)](docs/KeyVault_Security_Demo.pdf)
+
+---
+
+## 🧰 How to Use
+
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/asi-im-bir/TerraformSecureInfraLab.git
+   cd TerraformSecureInfraLab
+Configure your variables in:
+
+terraform.tfvars (local, private)
+
+or copy and edit the public template:
+
+bash
+Copy code
+cp terraform.tfvars.example terraform.tfvars
+Initialize and deploy:
+
+bash
+Copy code
+terraform init
+terraform plan
+terraform apply
+Author: asi-im-bir
+Focus: Secure Infrastructure as Code | Azure Cloud Security | DevSecOps | GRC Automation
+
+
 # Terraform Secure Infra Lab
 ## Project Overview
 ![img.png](img.png)
