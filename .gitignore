@@ -1,9 +1,4 @@
-.terraform/
-*.tfstate
-*.tfstate.backup
-crash.log
-.idea
-# Terraform sensitive files
+# Terraform
 *.tfstate
 *.tfstate.backup
 .terraform/
@@ -14,3 +9,10 @@ override.tf
 override.tf.json
 .terraform.lock.hcl
 
+# IDE / OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Nested projects
+**/BXL-Kamkar4-2025-cloud-project1-cloud-team-project-1/
