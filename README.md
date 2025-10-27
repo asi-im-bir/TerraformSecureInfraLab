@@ -7,49 +7,55 @@ The focus was on implementing **defense-in-depth**, **least privilege**, and **s
 
 The solution aligns with the **Azure Well-Architected Framework**, particularly the **Security**, **Reliability**, and **Cost Optimization** pillars.
 
+--
+## 🏗️ Technical Architecture Diagram
+
+```text
+                        ┌─────────────────────────────────────┐
+                        │           Azure Cloud               │
+                        │─────────────────────────────────────│
+                        │                                     │
+                        │    ┌────────────────────────────┐    │
+   Internet  ───────────▶    │     Public Subnet (DMZ)    │    │
+                        │    │  10.0.1.0/24               │    │
+                        │    │                            │    │
+                        │    │  [ Bastion VM ]            │    │
+                        │    │   • Public IP              │    │
+                        │    │   • SSH from admin IP only │    │
+                        │    └─────────────┬──────────────┘    │
+                        │                  │ SSH (22)           │
+                        │                  ▼                    │
+                        │    ┌────────────────────────────┐    │
+                        │    │   Private Subnet (App)     │    │
+                        │    │  10.0.2.0/24               │    │
+                        │    │                            │    │
+                        │    │  [ Private VM ]            │    │
+                        │    │   • No public IP           │    │
+                        │    │   • Managed Identity       │    │
+                        │    └─────────────┬──────────────┘    │
+                        │                  │                    │
+                        │                  ▼                    │
+                        │      ┌──────────────────────┐         │
+                        │      │   Azure Key Vault    │         │
+                        │      │  • Secrets storage   │         │
+                        │      │  • Access policies   │         │
+                        │      │  • Managed Identity  │         │
+                        │      └──────────────────────┘         │
+                        │                                     │
+                        └─────────────────────────────────────┘
 ---
 
-## 🗺️ Architecture Overview (Visual)
 
-markdown
-Copy code
-                      🌐 Azure Cloud
-┌──────────────────────────────────────────────────────────────┐
-│ Resource Group: rg-terraform-securelab │
-│ │
-│ ┌────────────────────────────────────────────────────────┐ │
-│ │ Virtual Network (10.0.0.0/16) │ │
-│ │ │ │
-│ │ ┌──────────── Public Subnet (10.0.1.0/24) ──────────┐ │ │
-│ │ │ │ │ │
-│ │ │ 🖥️ Bastion Host (Jump Server) │ │ │
-│ │ │ - Public IP (restricted by admin CIDR) │ │ │
-│ │ │ - NSG: Allow SSH from YOUR_PUBLIC_IP only │ │ │
-│ │ └──────────────────────────────────────────────────┘ │ │
-│ │ │ │
-│ │ ┌──────────── Private Subnet (10.0.2.0/24) ─────────┐ │ │
-│ │ │ │ │ │
-│ │ │ 🖥️ Application VM (Private) │ │ │
-│ │ │ - No Public IP │ │ │
-│ │ │ - Accessible only via Bastion Host (SSH) │ │ │
-│ │ │ - Managed Identity enabled │ │ │
-│ │ └──────────────────────────────────────────────────┘ │ │
-│ │ │ │
-│ └────────────────────────────────────────────────────────┘ │
-│ │
-│ 🔐 Azure Key Vault (kv-secure-xxxxxx) │
-│ - Stores secrets (e.g., DB passwords, SSH keys) │
-│ - Access Policy: “Get” only for Private VM identity │
-│ - Soft Delete (7-day retention) enabled │
-│ │
-│ 📊 Azure Monitor & Log Analytics │
-│ - Collects logs and metrics │
-│ - Enables security monitoring & auditing │
-│ │
-└──────────────────────────────────────────────────────────────┘
+🛡️ Security Flow Summary:
 
-markdown
-Copy code
+Bastion VM = Controlled entry point
+
+Private VM = Application workload (no internet access)
+
+Key Vault = Central secret storage
+
+Managed Identity = Secure credential access without secrets
+
 
 ### **Key Security Patterns**
 - **Defense-in-Depth:** Layered network and identity security boundaries  
@@ -101,7 +107,8 @@ Sensitive data such as passwords and SSH keys are often mismanaged, and network 
   - 🔹 Compute module (bastion + private VM)
   - 🔹 Key Vault module (secret management)
   - 🔹 Security configuration module (access policies)
-- **Azure Key Vault integration** to store and protect SSH keys & app secrets.
+
+- **Azure Key Vault integration** to store and protect SSHkeys & app secrets.
 - **Managed Identities** to eliminate plaintext credentials (Secret Zero principle).
 - **Network Security** implementing DMZ pattern with public/private segmentation.
 - **Monitoring & logging** via Azure Monitor and Log Analytics.
@@ -213,7 +220,7 @@ Author: asi-im-bir
 Focus: Secure Infrastructure as Code | Azure Cloud Security | DevSecOps | GRC Automation
 
 
-# Terraform Secure Infra Lab
+# Terraform Secure Infra Lab General
 ## Project Overview
 ![img.png](img.png)
 This project implements a secure, cost-optimized Azure infrastructure using Terraform Infrastructure as Code (IaC). The architecture follows Azure
