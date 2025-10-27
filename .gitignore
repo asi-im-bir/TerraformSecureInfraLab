@@ -3,4 +3,14 @@
 *.tfstate.backup
 crash.log
 .idea
+# Terraform sensitive files
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+terraform.tfvars.json
+crash.log
+override.tf
+override.tf.json
+.terraform.lock.hcl
 
