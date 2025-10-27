@@ -1,0 +1,15 @@
+# Example variable values for Terraform Secure Infra Lab
+# Replace with your own before deploying
+
+resource_group_name     = "rg-terraform-securelab"
+resource_group_location = "westeurope"
+
+vnet_cidr           = "10.0.0.0/16"
+public_subnet_cidr  = "10.0.1.0/24"
+private_subnet_cidr = "10.0.2.0/24"
+
+# Replace this with your own admin public IP (e.g., your home or office IP)
+allowed_admin_cidr = "YOUR_PUBLIC_IP/32"
+
+# Enable or disable RDP access (for Windows VMs)
+enable_rdp_rule = false
