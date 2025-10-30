@@ -81,67 +81,77 @@ A **hardened Azure lab** with centralized secrets, restricted network access, an
 💡 **Estimated Monthly Cost:** ~$15–20 (with auto-shutdown enabled)
 
 ---
+
 ## 🏗️ Technical Architecture
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/asi-im-bir/TerraformSecureInfraLab/main/terraform.png" alt="Terraform Secure Infrastructure Architecture" width="750"/>
+</p>
 
-![Terraform Secure Infrastructure Architecture](docs/terraform.png)
+The **Terraform Secure Infrastructure Lab** builds a **defense-in-depth Azure environment** that separates public and private workloads, manages secrets securely, and enforces least-privilege access.
 
-The Terraform Secure Infrastructure Lab builds a defense-in-depth Azure environment that separates public and private workloads, manages secrets securely, and enforces least privilege access.
+---
 
-🌐 Overview
+### 🌐 Overview
 
-All resources are deployed inside an Azure Virtual Network (VNet) divided into two subnets:
+All resources are deployed inside an **Azure Virtual Network (VNet)** divided into two subnets:
 
-Public Subnet (DMZ): Hosts the Bastion VM, the only resource with a public IP. SSH access is restricted to a specific admin IP.
+- **Public Subnet (DMZ):** Hosts the **Bastion VM**, the only resource with a public IP.  
+  SSH access is restricted to a specific admin IP.
 
-Private Subnet (App): Hosts the Private VM, which has no public IP and connects only through the Bastion VM.
+- **Private Subnet (App):** Hosts the **Private VM**, which has **no public IP** and connects only through the Bastion VM.
 
-The Azure Key Vault stores all secrets (e.g., SSH keys, app credentials) and is accessed securely via Managed Identities — eliminating the need for plaintext secrets.
+- **Azure Key Vault:** Stores all secrets (e.g., SSH keys, credentials) and is accessed securely via **Managed Identities**, eliminating plaintext secrets.
 
-Azure Active Directory (AAD) provides authentication and Role-Based Access Control (RBAC) for users and services.
+- **Azure Active Directory (AAD):** Provides authentication and **Role-Based Access Control (RBAC)** for users and services.
 
-Azure Monitor and Log Analytics collect logs and metrics from all components for visibility and compliance.
+- **Azure Monitor & Log Analytics:** Collect logs and metrics from all components for visibility, alerting, and compliance.
 
-🔐 Security Layers
+---
 
-Network Isolation: Public and private subnets protected with NSGs and minimal open ports.
+### 🔐 Security Layers
 
-Identity Security: Managed Identities and RBAC ensure least-privilege access.
+| Layer | Implementation |
+|--------|----------------|
+| **Network Isolation** | Public and private subnets protected with NSGs and minimal open ports. |
+| **Identity Security** | Managed Identities and RBAC ensure least-privilege access. |
+| **Secret Management** | Centralized secrets in Key Vault with soft delete and access logging. |
+| **Operational Monitoring** | Azure Monitor tracks performance, security, and access events. |
 
-Secret Management: Centralized secrets in Key Vault with soft delete and access logging.
+---
 
-Operational Monitoring: Azure Monitor tracks performance, security, and access events.
+### ⚙️ Flow Summary
 
-⚙️ Flow Summary
+1. Admin connects to **Bastion VM** from an approved IP via SSH.  
+2. **Bastion VM** connects to **Private VM** over the internal network.  
+3. **Private VM** retrieves secrets from **Azure Key Vault** using its Managed Identity.  
+4. **Azure AD** authenticates all access requests and enforces RBAC.  
 
-Admin connects to Bastion VM from an approved IP via SSH.
+This architecture ensures a **secure, auditable, and cost-optimized Azure environment**, following best practices from the **Azure Well-Architected Framework**.
 
-Bastion connects to Private VM over the internal network.
+---
 
-Private VM retrieves secrets from Azure Key Vault using Managed Identity.
+### 🔒 Security Flow Summary
 
-Azure AD authenticates all access requests and enforces RBAC.
+| Component | Role | Key Security Controls |
+|------------|------|------------------------|
+| **Bastion VM** | Secure entry point | Public IP restricted to admin source IP; SSH only. |
+| **Private VM** | Application workload | No public IP; accesses Key Vault via Managed Identity. |
+| **Azure Key Vault** | Secrets management | Centralized credentials storage; access via RBAC. |
+| **Managed Identity** | Credential access | Eliminates plaintext secrets; token-based auth. |
+| **NSGs** | Network defense | Explicit allow/deny inbound and outbound rules. |
+| **Azure Monitor** | Logging & telemetry | Collects logs and metrics for Bastion and Private VMs. |
 
-This architecture ensures a secure, auditable, and cost-optimized Azure environment, following best practices from the Azure Well-Architected Framework.
-             
-
-🔐 Security Flow Summary
-Component	Role	Key Security Controls
-Bastion VM	Secure entry point	Public IP restricted to admin source IP; SSH only
-Private VM	Application workload	No public IP; accesses Key Vault via Managed Identity
-Azure Key Vault	Secrets management	Centralized credentials storage; Key & Secret access via RBAC
-Managed Identity	Credential access	Eliminates plaintext secrets in code; direct AAD token-based access
-NSGs	Network perimeter defense	Explicit allow/deny inbound/outbound rules
-Azure Monitor	Logging & telemetry	Collects logs and metrics from Bastion & Private VMs
+---
 
 ## 📈 Security & Compliance Alignment
 
 | Framework | Implementation |
 |------------|----------------|
-| **ISO/IEC 27001** | A.9 Access Control, A.10 Cryptographic Controls — via RBAC and Key Vault |
-| **NIST CSF** | *Protect* and *Detect* functions through IAM, logging, and segmentation |
-| **CIS Controls v8** | Controls 3 (Data Protection), 4 (Secure Configs), 6 (Access Management) |
-| **Azure Well-Architected Framework** | Security, Reliability, and Cost Optimization pillars addressed |
+| **ISO/IEC 27001** | A.9 Access Control & A.10 Cryptographic Controls implemented via RBAC and Key Vault. |
+| **NIST CSF** | *Protect* and *Detect* functions achieved through IAM, logging, and segmentation. |
+| **CIS Controls v8** | Controls 3 (Data Protection), 4 (Secure Configurations), 6 (Access Management). |
+| **Azure Well-Architected Framework** | Security, Reliability, and Cost Optimization pillars addressed. |
 
 ---
 
@@ -170,15 +180,15 @@ terraform apply
 ✅ Retrieve secrets from Key Vault via Managed Identity
 
 📚 Lessons Learned
-Modular Terraform improves scalability and maintainability
+Modular Terraform design improves scalability and maintainability.
 
-Managed Identities + Key Vault eliminate credential exposure
+Managed Identities + Key Vault eliminate credential exposure.
 
-Defense-in-Depth through IAM + NSGs = layered protection
+Defense-in-Depth through IAM and NSGs provides layered protection.
 
-Negative access tests validated IAM and NSG boundaries
+Negative access tests validated IAM and NSG boundaries.
 
-Balancing cost optimization with security controls is key
+Balancing cost optimization with strong security controls is essential.
 
 💼 Value to Employers
 This project demonstrates the ability to:
@@ -191,9 +201,11 @@ This project demonstrates the ability to:
 
 🧩 Future Roadmap
 Enhancement	Description
-CI/CD Integration	Automate Terraform via GitHub Actions or Azure DevOps
-Policy-as-Code	Enforce Azure Policies for compliance and tagging
-RBAC Authorization for Key Vault	Replace access policies with Azure RBAC
-Private Endpoints	Isolate Key Vault and Storage within VNet
-Azure Sentinel Integration	Real-time threat detection and logging
-Multi-Region Design	Add redundancy and disaster recovery
+CI/CD Integration	Automate Terraform via GitHub Actions or Azure DevOps.
+Policy-as-Code	Enforce Azure Policies for compliance and tagging.
+RBAC Authorization for Key Vault	Replace access policies with Azure RBAC.
+Private Endpoints	Isolate Key Vault and Storage within the VNet.
+Azure Sentinel Integration	Enable real-time detection and centralized logging.
+Multi-Region Design	Add redundancy and disaster recovery for resilience.
+
+
