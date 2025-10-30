@@ -1,4 +1,54 @@
-# 🌩️ Terraform Secure Infrastructure Lab  
+## 🎯 Summary for Hiring Managers
+
+The **Terraform Secure Infrastructure Lab** showcases my ability to **architect, automate, and secure cloud environments** using **Terraform Infrastructure as Code (IaC)** and **Azure-native security controls**.  
+It demonstrates how to implement **defense-in-depth**, **least privilege**, and **secret zero** principles through fully automated, modular Terraform design.
+
+---
+
+### 🧩 Key Security Implementations
+
+| Security Domain | Implementation | Impact |
+|------------------|----------------|--------|
+| **Identity & Access Management (IAM)** | Enforced least privilege with **Azure RBAC** and **Managed Identities** — no static credentials in code. | Eliminates secret sprawl and lateral movement risk. |
+| **Secret Management** | Centralized all credentials in **Azure Key Vault** with **soft delete**, **audit logging**, and **RBAC policies**. | Ensures full secret lifecycle control and ISO 27001 A.10 compliance. |
+| **Network Security** | Segmented network into **Public (DMZ)** and **Private (App)** subnets with restrictive **NSG rules**. | Reduces attack surface and isolates workloads from the internet. |
+| **Operational Security** | Applied **UFW**, **Fail2ban**, and **unattended-upgrades** on all VMs. | Provides host-level hardening and automated patching. |
+| **Monitoring & Auditing** | Integrated **Azure Monitor** and **Log Analytics** for telemetry and access visibility. | Enables continuous compliance and real-time incident detection. |
+
+---
+
+### 🔐 Design Principles Applied
+- **Defense-in-Depth:** Layered identity, network, and data protection.  
+- **Secret Zero:** No plaintext secrets — all accessed via Managed Identities.  
+- **Least Privilege:** Every component runs with minimal necessary permissions.  
+- **Immutable Infrastructure:** Fully version-controlled, reproducible Terraform builds.  
+
+---
+
+### 🛡️ Compliance Alignment
+
+| Framework | Implementation |
+|------------|----------------|
+| **ISO/IEC 27001** | A.9 Access Control, A.10 Cryptographic Controls via Key Vault and RBAC. |
+| **NIST CSF** | *Protect* and *Detect* functions implemented through IAM, logging, and segmentation. |
+| **CIS Controls v8** | Controls 3 (Data Protection), 4 (Secure Configurations), 6 (Access Management). |
+
+---
+
+### 💼 Business Value
+
+By embedding **security controls directly into Terraform modules**, this lab delivers:
+
+- ✅ **Continuous compliance** with minimal manual audit effort  
+- ✅ **Secure-by-default deployments** for Dev/Test workloads  
+- ✅ **Integrated GRC and DevSecOps** alignment  
+- ✅ **Reduced operational cost** without weakening security  
+
+> 🔑 *This project demonstrates my ability to bridge DevSecOps automation with GRC governance — building infrastructure that is secure, compliant, and production-ready from day one.*
+
+
+
+# 🌩️ Terraform Secure Infrastructure Lab in Detail
 ### Azure Key Vault Security | Defense-in-Depth Cloud Architecture
 
 > **A Terraform-based Azure infrastructure lab** demonstrating secure-by-design principles — built with **defense-in-depth**, **least privilege**, and **separation of duties**.  
