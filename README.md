@@ -4,18 +4,6 @@
 > **A Terraform-based Azure infrastructure lab** demonstrating secure-by-design principles — built with **defense-in-depth**, **least privilege**, and **separation of duties**.  
 > Implements **Azure Key Vault**, **Managed Identities**, and **modular IaC** patterns aligned with the **Azure Well-Architected Framework** (Security, Reliability, and Cost Optimization pillars).
 
-## 🏗️ Technical Architecture
-
-             
-
-🔐 Security Flow Summary
-Component	Role	Key Security Controls
-Bastion VM	Secure entry point	Public IP restricted to admin source IP; SSH only
-Private VM	Application workload	No public IP; accesses Key Vault via Managed Identity
-Azure Key Vault	Secrets management	Centralized credentials storage; Key & Secret access via RBAC
-Managed Identity	Credential access	Eliminates plaintext secrets in code; direct AAD token-based access
-NSGs	Network perimeter defense	Explicit allow/deny inbound/outbound rules
-Azure Monitor	Logging & telemetry	Collects logs and metrics from Bastion & Private VMs
 ## 🧱 Project Summary
 
 **Goal:**  
@@ -93,6 +81,58 @@ A **hardened Azure lab** with centralized secrets, restricted network access, an
 💡 **Estimated Monthly Cost:** ~$15–20 (with auto-shutdown enabled)
 
 ---
+## 🏗️ Technical Architecture
+
+
+![Terraform Secure Infrastructure Architecture](docs/terraform.png)
+
+The Terraform Secure Infrastructure Lab builds a defense-in-depth Azure environment that separates public and private workloads, manages secrets securely, and enforces least privilege access.
+
+🌐 Overview
+
+All resources are deployed inside an Azure Virtual Network (VNet) divided into two subnets:
+
+Public Subnet (DMZ): Hosts the Bastion VM, the only resource with a public IP. SSH access is restricted to a specific admin IP.
+
+Private Subnet (App): Hosts the Private VM, which has no public IP and connects only through the Bastion VM.
+
+The Azure Key Vault stores all secrets (e.g., SSH keys, app credentials) and is accessed securely via Managed Identities — eliminating the need for plaintext secrets.
+
+Azure Active Directory (AAD) provides authentication and Role-Based Access Control (RBAC) for users and services.
+
+Azure Monitor and Log Analytics collect logs and metrics from all components for visibility and compliance.
+
+🔐 Security Layers
+
+Network Isolation: Public and private subnets protected with NSGs and minimal open ports.
+
+Identity Security: Managed Identities and RBAC ensure least-privilege access.
+
+Secret Management: Centralized secrets in Key Vault with soft delete and access logging.
+
+Operational Monitoring: Azure Monitor tracks performance, security, and access events.
+
+⚙️ Flow Summary
+
+Admin connects to Bastion VM from an approved IP via SSH.
+
+Bastion connects to Private VM over the internal network.
+
+Private VM retrieves secrets from Azure Key Vault using Managed Identity.
+
+Azure AD authenticates all access requests and enforces RBAC.
+
+This architecture ensures a secure, auditable, and cost-optimized Azure environment, following best practices from the Azure Well-Architected Framework.
+             
+
+🔐 Security Flow Summary
+Component	Role	Key Security Controls
+Bastion VM	Secure entry point	Public IP restricted to admin source IP; SSH only
+Private VM	Application workload	No public IP; accesses Key Vault via Managed Identity
+Azure Key Vault	Secrets management	Centralized credentials storage; Key & Secret access via RBAC
+Managed Identity	Credential access	Eliminates plaintext secrets in code; direct AAD token-based access
+NSGs	Network perimeter defense	Explicit allow/deny inbound/outbound rules
+Azure Monitor	Logging & telemetry	Collects logs and metrics from Bastion & Private VMs
 
 ## 📈 Security & Compliance Alignment
 
